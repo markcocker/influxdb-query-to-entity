@@ -1,6 +1,6 @@
 # influxdb-query-to-sensor
 
-Python script to query an InfluxDB database and create a Home Assistant sensor with the results in the sensor's attributes as name:value pairs.
+Python script to query an InfluxDB database and create a Home Assistant sensor with the results in the sensor's attributes as `key: value` pairs.
 
 ## Installation
 
@@ -51,7 +51,7 @@ With the above installation complete, you can now call the script via the Home A
 | Parameter | Required? | Default | Description |
 | --- | --- | --- | --- |
 | `database` | ✅ | | InfluxDB database name|
-| `query` | ✅ | | InfluxDB query. The query should return at least the two fields specified by key_field_name and value_field_name. The field 'time' is always returned so typically query will only specify one field. For each point in the result a sensor attribute will be added to the sensor, so be careful not to return too many (100s) of points. Test the query in the InfluxDB web UI or command line interface |
+| `query` | ✅ | | InfluxDB query. The query should return at least the two fields specified by key_field_name and value_field_name. The field `time` is always returned so typically `query` will only specify one field. For each point in the result, a sensor attribute will be added to the sensor, so be careful not to return too many (100s) of points. Test the query in the InfluxDB web UI or command line interface |
 | `key_field_name` | | time | Name of the field returned by the query that will be used as the attribute key |
 | `value_field_name` | | sum | Name of the field returned by the query that will be used as the attribute value |
 | `sensor` | ✅ | | Name of the Home Assistant sensor to update |
@@ -67,7 +67,7 @@ To query InfluxDB, call the `influxdb_query_to_sensor` service and pass the quer
 
 2. Select `GO TO YAML MODE`
 
-3. In `Service data` enter the query. You will need to substitute your InfluxDB database, query, field names, and sensor details here. Use the InfluxDB or Grafana web UIs to create and test the query:
+3. In `Service data` enter the query. You will need to substitute your InfluxDB database name, query, field names, and sensor details here. Use the InfluxDB or Grafana web UIs to create and test the query:
 
     ```yaml
     database: octopus
@@ -87,7 +87,7 @@ To query InfluxDB, call the `influxdb_query_to_sensor` service and pass the quer
 
 4. Click CALL SERVICE. See [Developer Tools](docs/DeveloperTools.png) screenshot.
 
-5. Check the sensor in Developer Tools → SERVICES by clicking `STATES`. See [Developer Tools - States](docs/DeveloperTools-States.png) screenshot.
+5. Check the sensor in Developer Tools → SERVICES by clicking `STATES` and search for the name of the sensor. See [Developer Tools - States](docs/DeveloperTools-States.png) screenshot an example of the query results in the sensor.
 
 You can now automate running the query from Configuration > Automations, Node Red and elsewhere.
 
@@ -99,7 +99,7 @@ Once you have the sensor being populated with the query results, you can create 
 
     For example: HACS → Frontend → `+ EXPLORE & ADD REPOSITORIES` → apexcharts-card
 
-2. Edit Dashboard → `+ ADD CARD` → Manual. Enter the card configuration. In the following example note the data_generator section that iterates over the sensor attributes:
+2. Navigate to the dashboard for the card → `Edit Dashboard` → `+ ADD CARD` → `Manual`. Enter the card configuration. In the following example note the [data_generator option](https://github.com/RomRider/apexcharts-card#data_generator-option) that iterates over the sensor attributes to use all `timestamp: value` entries as data for the series:
 
     ```yaml
     type: 'custom:apexcharts-card'
