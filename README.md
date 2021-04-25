@@ -24,7 +24,7 @@ Python script to query an InfluxDB database and create a Home Assistant sensor w
     git clone https://github.com/markcocker/influxdb-query-to-sensor.git __init__.py
     ```
 
-5. Add the `influxdb_query_to_sensor` application entry and configuration into the `apps` section of the Pyscript configuration.
+5. Add the `influxdb_query_to_sensor` application entry and configuration into the `apps` section of the [Pyscript configuration](https://hacs-pyscript.readthedocs.io/en/latest/reference.html#configuration).
 
     For example, in `/config/configuration.yaml` add:
 
@@ -32,7 +32,7 @@ Python script to query an InfluxDB database and create a Home Assistant sensor w
     pyscript: !include pyscript.yaml
     ```
 
-    And in `/config/pyscript.yaml` configure your InfluxDB endpoint host, port, username and password:
+    And in `/config/pyscript.yaml` configure your InfluxDB endpoint host, port, username and password. Not shown here, but it is best practice to store usernames and passwords in a separate secrets.yaml file.
 
     ```yaml
     allow_all_imports: true
@@ -48,18 +48,28 @@ Python script to query an InfluxDB database and create a Home Assistant sensor w
 
 With the above installation complete, you can now call the script via the Home Assistant service `influxdb_query_to_sensor`. The service accepts the following service data.
 
-| Parameter | Required? | Default | Description |
-| --- | --- | --- | --- |
-| `database` | ✅ | | InfluxDB database name|
-| `query` | ✅ | | InfluxDB query. The query should return at least the two fields specified by key_field_name and value_field_name. The field `time` is always returned so typically `query` will only specify one field. For each point in the result, a sensor attribute will be added to the sensor, so be careful not to return too many (100s) of points. Test the query in the InfluxDB web UI or command line interface |
-| `key_field_name` | | time | Name of the field returned by the query that will be used as the attribute key |
-| `value_field_name` | | sum | Name of the field returned by the query that will be used as the attribute value |
-| `sensor` | ✅ | | Name of the Home Assistant sensor to update |
-| `unit_of_measurement` | | | If specified, add the sensor attribute unit_of_measurement with the value |
-| `friendly_name` | | | If specified, add the sensor attribute friendly_name with the value |
-| `icon` | | | If specified, add the sensor attribute icon with the value |
+| Parameter | Type | Required? | Default | Description |
+| --- | --- | --- | --- | --- |
+| <a name="database">`database`</a> | string | ✅ | | InfluxDB database name|
+| `query` | string | ✅ | | InfluxDB query. The query should return at least the two fields specified by key_field_name and value_field_name. The field `time` is always returned so typically `query` will only specify one field. For each point in the result, a sensor attribute will be added to the sensor, so be careful not to return too many (100s) of points. Test the query in the InfluxDB web UI or command line interface |
+| <a name="key_field_name">`key_field_name`</a> | string | | time | Name of the field returned by the query that will be used as the attribute key |
+| <a name="value_field_name">`value_field_name`</a> | string | | sum | Name of the field returned by the query that will be used as the attribute value |
+| <a name="sensor">`sensor` | string | ✅ | | Name of the Home Assistant sensor to update |
+| <a name="unit_of_measurement">`unit_of_measurement`</a> | string | | | If specified, add the sensor attribute unit_of_measurement with the value |
+| <a name="friendly_name">`friendly_name`</a> | string | | | If specified, add the sensor attribute friendly_name with the value |
+| <a name="icon">`icon`</a> | string | | | If specified, add the sensor attribute icon with the value |
 
-## Example query
+## Results
+
+The service influxdb_query_to_sensor will:
+
+* connect to InfluxDB and send the query
+* create the sensor and remove all previous attributes
+* set the sensor value to the current timesamp
+* optionally set the sensor attributes unit_of_measurement, friendly_name, icon if they were specified
+* for each point returned in the query, extract the fields specified by key_field_name and value_field_name and use them to add as a sensor attribute
+
+## Example
 
 To query InfluxDB, call the `influxdb_query_to_sensor` service and pass the query and sensor details in the service data. For example:
 
