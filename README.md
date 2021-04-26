@@ -124,7 +124,9 @@ Once you have the sensor being populated with the query results, you can create 
         let res = [];
         for (const [key, value] of
             Object.entries(entity.attributes)) {
-            res.push([new Date(key).getTime(), value]);
+            let d = new Date(key).getTime();
+            if (d > 0)
+               res.push([new Date(key).getTime(), value]);
         }
         return res.sort((a, b) => { return a[0] - b[0] });
     graph_span: 30days
