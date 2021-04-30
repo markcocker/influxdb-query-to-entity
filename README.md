@@ -1,6 +1,6 @@
-# influxdb-query-to-sensor
+# influxdb-query-to-entity
 
-Python script to query an InfluxDB database and create a Home Assistant sensor with the results in the sensor's attributes as `key: value` pairs.
+Python script to query an InfluxDB database and create a Home Assistant entity with the results in the entity's attributes as `key: value` pairs.
 
 ## Installation
 
@@ -14,17 +14,17 @@ Python script to query an InfluxDB database and create a Home Assistant sensor w
 
 3. Restart Home Assistant.
 
-4. Create the folder `config/pyscript/apps/influxdb_query_to_sensor/` and copy the script [__init__.py](__init__.py) into it.
+4. Create the folder `config/pyscript/apps/influxdb_query_to_entity/` and copy the script [\_\_init\_\_.py](__init__.py) into it.
 
     For example, in Terminal enter:
 
     ```shell
-    mkdir -p /config/pyscript/apps/influxdb_query_to_sensor/ && cd $_
+    mkdir -p /config/pyscript/apps/influxdb_query_to_entity/ && cd $_
 
-    git clone https://github.com/markcocker/influxdb-query-to-sensor.git __init__.py
+    git clone https://github.com/markcocker/influxdb-query-to-entity.git __init__.py
     ```
 
-5. Add the `influxdb_query_to_sensor` application entry and configuration into the `apps` section of the [Pyscript configuration](https://hacs-pyscript.readthedocs.io/en/latest/reference.html#configuration).
+5. Add the `influxdb_query_to_entity` application entry and configuration into the `apps` section of the [Pyscript configuration](https://hacs-pyscript.readthedocs.io/en/latest/reference.html#configuration).
 
     For example, in `/config/configuration.yaml` add:
 
@@ -37,47 +37,47 @@ Python script to query an InfluxDB database and create a Home Assistant sensor w
     ```yaml
     allow_all_imports: true
     apps:
-      influxdb_query_to_sensor:
+      influxdb_query_to_entity:
         host: a0d7b954-influxdb
         port: 8086
         username: homeassistant
         password: XYZ
     ```
 
-## Syntax for service influxdb_query_to_sensor
+## Syntax for service
 
-With the above installation complete, you can now call the script via the Home Assistant service `influxdb_query_to_sensor`. The service accepts the following service data.
+With the above installation complete, you can now call the script via the Home Assistant service `influxdb_query_to_entity`. The service accepts the following service data.
 
 | Parameter | Type | Required? | Default | Description |
 | --- | --- | --- | --- | --- |
-| <a name="database">`database`</a> | string | ✅ | | InfluxDB database name|
-| `query` | string | ✅ | | InfluxDB query. The query should return at least the two fields specified by key_field_name and value_field_name. The field `time` is always returned so typically `query` will only specify one field. For each point in the result, a sensor attribute will be added to the sensor, so be careful not to return too many (100s) of points. Test the query in the InfluxDB web UI or command line interface |
+| <a name="database">`database`</a> | string | ✅ | | InfluxDB database name |
+| `query` | string | ✅ | | InfluxDB query. The query should return at least the two fields specified by key_field_name and value_field_name. The field `time` is always returned so typically `query` will only specify one field. For each point in the result, an attribute will be added to the entity, so be careful not to return too many (100s) of points. Test the query in the InfluxDB web UI or command line interface |
 | <a name="key_field_name">`key_field_name`</a> | string | | time | Name of the field returned by the query that will be used as the attribute key |
 | <a name="value_field_name">`value_field_name`</a> | string | | sum | Name of the field returned by the query that will be used as the attribute value |
-| <a name="sensor">`sensor` | string | ✅ | | Name of the Home Assistant sensor to update |
-| <a name="unit_of_measurement">`unit_of_measurement`</a> | string | | | If specified, add the sensor attribute unit_of_measurement with the value |
-| <a name="friendly_name">`friendly_name`</a> | string | | | If specified, add the sensor attribute friendly_name with the value |
-| <a name="icon">`icon`</a> | string | | | If specified, add the sensor attribute icon with the value |
+| <a name="entity_id">`entity_id` | string | ✅ | | Entity in Home Assistant to create or update |
+| <a name="unit_of_measurement">`unit_of_measurement`</a> | string | | | If specified, add the entity attribute unit_of_measurement with the value |
+| <a name="friendly_name">`friendly_name`</a> | string | | | If specified, add the entity attribute friendly_name with the value |
+| <a name="icon">`icon`</a> | string | | | If specified, add the entity attribute icon with the value |
 
 ## Results
 
-The service influxdb_query_to_sensor will:
+The service will:
 
 * connect to InfluxDB and send the query
-* create the sensor and remove all previous attributes
-* set the sensor value to the current timesamp
-* optionally set the sensor attributes unit_of_measurement, friendly_name, icon if they were specified
-* for each point returned in the query, extract the fields specified by key_field_name and value_field_name and use them to add as a sensor attribute
+* create the entity and remove all previous attributes
+* set the entity value to the current timestamp
+* optionally set the entity attributes unit_of_measurement, friendly_name, icon if they were specified
+* for each point returned in the query, extract the fields specified by key_field_name and value_field_name and use them to add as a entity attribute
 
 ## Example
 
-To query InfluxDB, call the `influxdb_query_to_sensor` service and pass the query and sensor details in the service data. For example:
+To query InfluxDB, call the `influxdb_query_to_entity` service and pass the query and entity details in the service data. For example:
 
-1. Select Developer Tools → SERVICES → Service: `Pyscript Python scripting: influxdb_query_to_sensor`
+1. Select Developer Tools → SERVICES → Service: `Pyscript Python scripting: influxdb_query_to_entity`
 
 2. Select `GO TO YAML MODE`
 
-3. In `Service data` enter the query. You will need to substitute your InfluxDB database name, query, field names, and sensor details here. Use the InfluxDB or Grafana web UIs to create and test the query:
+3. In `Service data` enter the query. You will need to substitute your InfluxDB database name, query, field names, and entity details here. Use the InfluxDB or Grafana web UIs to create and test the query:
 
     ```yaml
     database: octopus
@@ -89,7 +89,7 @@ To query InfluxDB, call the `influxdb_query_to_sensor` service and pass the quer
       fill(none)
     key_field_name: time
     value_field_name: sum
-    sensor: sensor.octopus_electricity_consumption_30days
+    entity_id: sensor.octopus_electricity_consumption_30days
     unit_of_measurement: kWh
     friendly_name: Import
     icon: 'mdi:flash'
@@ -97,19 +97,19 @@ To query InfluxDB, call the `influxdb_query_to_sensor` service and pass the quer
 
 4. Click CALL SERVICE. See [Developer Tools](docs/DeveloperTools.png) screenshot.
 
-5. Check the sensor in Developer Tools → SERVICES by clicking `STATES` and search for the name of the sensor. See [Developer Tools - States](docs/DeveloperTools-States.png) screenshot an example of the query results in the sensor.
+5. Check the entity in Developer Tools → SERVICES by clicking `STATES` and search for the name of the entity. See [Developer Tools - States](docs/DeveloperTools-States.png) screenshot an example of the query results in the entity.
 
 You can now automate running the query from Configuration > Automations, Node Red and elsewhere.
 
-## Example card using data from the sensor
+## Example card using the entity
 
-Once you have the sensor being populated with the query results, you can create a chart to display the data. For example:
+Once you have the entity being populated with the query results, you can create a chart to display the data. For example:
 
 1. Install the Lovelace card [apexcharts-card](https://github.com/RomRider/apexcharts-card)
 
     For example: HACS → Frontend → `+ EXPLORE & ADD REPOSITORIES` → apexcharts-card
 
-2. Navigate to the dashboard for the card → `Edit Dashboard` → `+ ADD CARD` → `Manual`. Enter the card configuration. In the following example note the [data_generator option](https://github.com/RomRider/apexcharts-card#data_generator-option) that iterates over the sensor attributes to use all `timestamp: value` entries as data for the series:
+2. Navigate to the dashboard for the card → `Edit Dashboard` → `+ ADD CARD` → `Manual`. Enter the card configuration. In the following example note the [data_generator option](https://github.com/RomRider/apexcharts-card#data_generator-option) that iterates over the entity attributes to use all `timestamp: value` entries as data for the series:
 
     ```yaml
     type: 'custom:apexcharts-card'
