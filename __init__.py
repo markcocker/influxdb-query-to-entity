@@ -111,22 +111,26 @@ fields:
     # Get the points from the query
     points = response.get_points()
 
-    # Set the entity_id value to the current timestamp and remove existing attributes
-    state.set(entity_id, value=datetime.datetime.now(datetime.timezone.utc).isoformat(), new_attributes={})
+    attributes = {}
 
     # Set the entity_id attributes if they were passed on service call
     if unit_of_measurement:
-        state.setattr(entity_id+'.unit_of_measurement', unit_of_measurement)
+        attributes['unit_of_measurement'] = unit_of_measurement
 
     if friendly_name:    
-        state.setattr(entity_id+'.friendly_name', friendly_name)
+        attributes['friendly_name'] = friendly_name
 
     if icon:    
-        state.setattr(entity_id+'.icon', icon)
+        attributes['icon'] = icon
 
     # Add each InfluxDB query result point as an entity_id attribute
+    lastTime = ''
     for point in points:
-        state.setattr(entity_id+'.'+point[key_field_name], point[value_field_name])
+        attributes[point[key_field_name]] = point[value_field_name]
+        lastPoint = point['time']
+
+    # Set the entity_id value to the last query value and attributes to the query points
+    state.set(entity_id, value=lastPoint, new_attributes=attributes)
 
 
 # Get configuration from Pyscript
