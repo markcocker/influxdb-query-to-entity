@@ -129,8 +129,10 @@ fields:
         attributes[point[key_field_name]] = point[value_field_name]
         lastPoint = point['time']
 
-    # Set the entity_id value to the last query value and attributes to the query points
-    state.set(entity_id, value=lastPoint, new_attributes=attributes)
+    # Only create entity if the query returns at least 1 result
+    if lastPoint:
+        # Set the entity_id value to the last query value and attributes to the query points
+        state.set(entity_id, value=lastPoint, new_attributes=attributes)
 
 
 # Get configuration from Pyscript
